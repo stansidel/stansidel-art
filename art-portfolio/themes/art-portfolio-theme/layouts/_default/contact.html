@@ -1,0 +1,72 @@
+{{ define "main" }}
+<div class="contact-container">
+    <div class="contact-content">
+        <!-- Left side: Photo -->
+        <div class="contact-photo-section">
+            <img src="/contact-photo.jpg" alt="Stan Sidel with camera" class="contact-image">
+        </div>
+        
+        <!-- Right side: Form and contact info -->
+        <div class="contact-form-section">
+            <!-- Contact info at top -->
+            <div class="contact-info">
+                <h3>Representation</h3>
+                <div class="representation">
+                    <div class="rep-name">Stan Sidel</div>
+                    <div class="rep-details">
+                        <div class="rep-contact">
+                            <strong>Email:</strong>
+                            <a href="mailto:stan@stan.sidel.family">stan@stan.sidel.family</a>
+                        </div>
+                        <div class="rep-contact">
+                            <strong>Location:</strong>
+                            <span>Almaty, Kazakhstan</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="contact-divider">
+            
+            <!-- Contact form -->
+            <div class="contact-form-container">
+                <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                    <div class="form-group">
+                        <label>Purpose of email*</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="purpose" value="business" required>
+                                <span>Business Inquiries</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="purpose" value="booking" required>
+                                <span>Booking & Schedule</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Name*</label>
+                        <div class="name-fields">
+                            <input type="text" name="first_name" placeholder="First Name" required>
+                            <input type="text" name="last_name" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email*</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message (All Spam Will Be Ignored)*</label>
+                        <textarea id="message" name="message" rows="6" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">SUBMIT</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ end }} 

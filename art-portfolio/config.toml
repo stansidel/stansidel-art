@@ -19,6 +19,11 @@ theme = 'art-portfolio-theme'
     url = "/digital-art/"
     weight = 2
   [[menu.main]]
+    identifier = "contact"
+    name = "Contact"
+    url = "/contact/"
+    weight = 3
+  [[menu.main]]
     identifier = "about-blog"
     name = "Blog"
     url = "https://stan.sidel.family/"

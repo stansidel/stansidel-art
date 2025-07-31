@@ -1,7 +1,7 @@
 ---
 title: "Abstract Digital Art"
 description: "Experimental abstract compositions and digital paintings"
-image: "/images/abstract-art.jpg"
+image: "/images/abstract-art.svg"
 date: 2024-01-20
 ---
 

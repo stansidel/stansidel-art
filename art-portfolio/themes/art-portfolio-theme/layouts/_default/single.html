@@ -17,7 +17,7 @@
                 <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
                     data-full-res="{{ $image.RelPermalink }}" loading="lazy">
                 {{ else }}
-                {{ $resized := $image.Resize "1200x1200 webp q85" }}
+                {{ $resized := $image.Resize "1200x webp q85" }}
                 <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
                     data-full-res="{{ $image.RelPermalink }}" loading="lazy">
                 {{ end }}

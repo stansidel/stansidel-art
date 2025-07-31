@@ -13,7 +13,7 @@
                 {{ if eq $image.MediaType.SubType "svg" }}
                 <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
                 {{ else }}
-                {{ $resized := $image.Resize "600x600 webp q80" }}
+                {{ $resized := $image.Resize "600x webp q80" }}
                 <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
                 {{ end }}
                 {{ else }}

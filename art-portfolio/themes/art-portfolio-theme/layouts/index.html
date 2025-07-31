@@ -1,0 +1,21 @@
+{{ define "main" }}
+<div class="home-container">
+    <div class="hero">
+        <h1>{{ .Title }}</h1>
+        <p class="subtitle">{{ .Params.description | default .Site.Params.description }}</p>
+    </div>
+    
+    <div class="portfolio-sections">
+        <div class="section-grid">
+            <div class="section-card">
+                <h2><a href="/photography/">Photography</a></h2>
+                <p>A collection of my photographic work</p>
+            </div>
+            <div class="section-card">
+                <h2><a href="/digital-art/">Digital Art</a></h2>
+                <p>A collection of my digital artwork</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{ end }}

@@ -1,0 +1,20 @@
+baseURL = 'https://art.stan.sidel.family/'
+languageCode = 'en-us'
+title = 'Stan Sidel - Art Portfolio'
+theme = 'art-portfolio-theme'
+
+[params]
+  description = "Stan Sidel's photography and digital art portfolio"
+  author = "Stan Sidel"
+  
+[menu]
+  [[menu.main]]
+    identifier = "photography"
+    name = "Photography"
+    url = "/photography/"
+    weight = 1
+  [[menu.main]]
+    identifier = "digital-art"
+    name = "Digital Art"
+    url = "/digital-art/"
+    weight = 2

@@ -1,0 +1,27 @@
+{{ define "main" }}
+<div class="single-container">
+    <div class="single-header">
+        <h1>{{ .Title }}</h1>
+        {{ if .Params.description }}
+        <p class="single-description">{{ .Params.description }}</p>
+        {{ end }}
+        {{ if .Date }}
+        <p class="single-date">{{ .Date.Format "January 2, 2006" }}</p>
+        {{ end }}
+    </div>
+    
+    {{ if .Params.image }}
+    <div class="single-image">
+        <img src="{{ .Params.image }}" alt="{{ .Title }}">
+    </div>
+    {{ end }}
+    
+    <div class="single-content">
+        {{ .Content }}
+    </div>
+    
+    <div class="single-navigation">
+        <a href="{{ .Parent.RelPermalink }}" class="back-link">← Back to {{ .Parent.Title }}</a>
+    </div>
+</div>
+{{ end }}

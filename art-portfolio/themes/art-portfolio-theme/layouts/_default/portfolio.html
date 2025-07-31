@@ -5,7 +5,12 @@
         <div class="portfolio-item">
             <a href="{{ .RelPermalink }}">
                 {{ if .Params.image }}
+                {{ $image := .Resources.GetMatch .Params.image }}
+                {{ if $image }}
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}">
+                {{ else }}
                 <img src="{{ .Params.image }}" alt="{{ .Title }}">
+                {{ end }}
                 {{ end }}
             </a>
         </div>

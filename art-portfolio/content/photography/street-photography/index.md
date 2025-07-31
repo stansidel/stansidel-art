@@ -1,8 +1,8 @@
 ---
 title: "Street Photography"
 description: "Urban scenes and street life captured through the lens"
-image: "/images/street-photography.svg"
-additional_images: ["/images/street-photography-2.svg", "/images/street-photography-3.svg"]
+image: "street-photography.svg"
+additional_images: ["street-photography-2.svg", "street-photography-3.svg"]
 date: 2024-01-15
 ---
 

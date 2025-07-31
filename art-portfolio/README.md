@@ -17,14 +17,32 @@ A Hugo-based portfolio website for photography and digital art, similar to Kim �
 art-portfolio/
 ├── content/
 │   ├── _index.md              # Homepage
-│   ├── photography/
-│   │   ├── _index.md          # Photography section
-│   │   ├── street-photography.md
-│   │   └── landscape-photography.md
-│   └── digital-art/
-│       ├── _index.md          # Digital Art section
-│       ├── abstract-art.md
-│       └── digital-illustrations.md
+│   ├── photography/           # Photography section
+│   │   ├── _index.md
+│   │   ├── street-photography/    # Page Bundle
+│   │   │   ├── index.md
+│   │   │   ├── street-photography.svg
+│   │   │   ├── street-photography-2.svg
+│   │   │   └── street-photography-3.svg
+│   │   ├── landscape-photography/  # Page Bundle
+│   │   │   ├── index.md
+│   │   │   └── landscape-photography.svg
+│   │   └── portrait-photography/   # Page Bundle
+│   │       ├── index.md
+│   │       └── portrait-photography.svg
+│   └── digital-art/           # Digital Art section
+│       ├── _index.md
+│       ├── abstract-art/          # Page Bundle
+│       │   ├── index.md
+│       │   ├── abstract-art.svg
+│       │   ├── abstract-art-2.svg
+│       │   └── abstract-art-3.svg
+│       ├── digital-illustrations/ # Page Bundle
+│       │   ├── index.md
+│       │   └── digital-illustrations.svg
+│       └── digital-paintings/     # Page Bundle
+│           ├── index.md
+│           └── digital-paintings.svg
 ├── themes/art-portfolio-theme/ # Custom theme
 └── config.toml                # Hugo configuration
 ```
@@ -49,14 +67,23 @@ art-portfolio/
 ## Adding New Portfolio Items
 
 ### Photography Items
-Create new files in `content/photography/` with the following front matter:
+Create Page Bundles in `content/photography/` with the following structure:
 
+```
+content/photography/your-project/
+├── index.md
+├── your-project.jpg
+├── your-project-2.jpg
+└── your-project-3.jpg
+```
+
+Front matter in `index.md`:
 ```markdown
 ---
 title: "Your Photo Title"
 description: "Brief description of the photo"
-image: "/images/your-photo.jpg"
-additional_images: ["/images/your-photo-2.jpg", "/images/your-photo-3.jpg"]
+image: "your-project.jpg"
+additional_images: ["your-project-2.jpg", "your-project-3.jpg"]
 date: 2024-01-01
 ---
 
@@ -64,7 +91,13 @@ Your content here...
 ```
 
 ### Digital Art Items
-Create new files in `content/digital-art/` with the same front matter structure.
+Create Page Bundles in `content/digital-art/` with the same structure.
+
+### Using the Helper Script
+```bash
+./add-image.sh photography my-project "My Project Title" "Project description"
+```
+This creates the Page Bundle structure automatically.
 
 ### Project Structure
 - **Category Pages**: Show only images in a responsive grid

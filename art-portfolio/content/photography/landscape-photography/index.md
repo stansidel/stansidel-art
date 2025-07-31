@@ -1,7 +1,7 @@
 ---
 title: "Landscape Photography"
 description: "Natural landscapes and scenic vistas"
-image: "/images/landscape-photography.svg"
+image: "landscape-photography.svg"
 date: 2024-01-10
 ---
 

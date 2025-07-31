@@ -10,7 +10,12 @@
     <div class="project-images">
         {{ if .Params.image }}
         <div class="project-main-image">
+            {{ $image := .Resources.GetMatch .Params.image }}
+            {{ if $image }}
+            <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}">
+            {{ else }}
             <img src="{{ .Params.image }}" alt="{{ .Title }}">
+            {{ end }}
         </div>
         {{ end }}
         
@@ -18,7 +23,12 @@
         <div class="project-gallery">
             {{ range .Params.additional_images }}
             <div class="gallery-item">
+                {{ $additionalImage := $.Resources.GetMatch . }}
+                {{ if $additionalImage }}
+                <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}">
+                {{ else }}
                 <img src="{{ . }}" alt="{{ $.Title }}">
+                {{ end }}
             </div>
             {{ end }}
         </div>

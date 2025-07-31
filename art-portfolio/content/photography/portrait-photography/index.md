@@ -1,7 +1,7 @@
 ---
 title: "Portrait Photography"
 description: "People and character studies"
-image: "/images/portrait-photography.svg"
+image: "portrait-photography.svg"
 date: 2024-01-05
 ---
 

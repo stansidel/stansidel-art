@@ -1,7 +1,7 @@
 ---
 title: "Digital Illustrations"
 description: "Character designs and digital illustrations"
-image: "/images/digital-illustrations.svg"
+image: "digital-illustrations.svg"
 date: 2024-01-25
 ---
 

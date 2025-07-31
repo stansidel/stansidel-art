@@ -14,27 +14,32 @@ IMAGE_NAME=$2
 TITLE=$3
 DESCRIPTION=$4
 
-# Create the content file
-CONTENT_FILE="content/$CATEGORY/$IMAGE_NAME.md"
+# Create the Page Bundle directory and content file
+BUNDLE_DIR="content/$CATEGORY/$IMAGE_NAME"
+CONTENT_FILE="$BUNDLE_DIR/index.md"
 DATE=$(date +%Y-%m-%d)
+
+mkdir -p "$BUNDLE_DIR"
 
 cat > "$CONTENT_FILE" << EOF
 ---
 title: "$TITLE"
 description: "$DESCRIPTION"
-image: "/images/$IMAGE_NAME.jpg"
-additional_images: ["/images/$IMAGE_NAME-2.jpg", "/images/$IMAGE_NAME-3.jpg"]
+image: "$IMAGE_NAME.jpg"
+additional_images: ["$IMAGE_NAME-2.jpg", "$IMAGE_NAME-3.jpg"]
 date: $DATE
 ---
 
 Add your content here...
 EOF
 
-echo "✅ Created content file: $CONTENT_FILE"
-echo "📝 Edit the file to add your content"
-echo "🖼️  Add your image as: static/images/$IMAGE_NAME.jpg"
+echo "✅ Created Page Bundle: $BUNDLE_DIR"
+echo "📝 Edit the file to add your content: $CONTENT_FILE"
+echo "🖼️  Add your images to: $BUNDLE_DIR/"
+echo "   - Main image: $BUNDLE_DIR/$IMAGE_NAME.jpg"
+echo "   - Additional images: $BUNDLE_DIR/$IMAGE_NAME-2.jpg, $BUNDLE_DIR/$IMAGE_NAME-3.jpg"
 echo ""
 echo "Next steps:"
-echo "1. Add your image to static/images/$IMAGE_NAME.jpg"
+echo "1. Add your images to $BUNDLE_DIR/"
 echo "2. Edit $CONTENT_FILE to add your content"
 echo "3. Run 'hugo server' to preview" 

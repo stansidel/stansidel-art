@@ -7,9 +7,14 @@
                 {{ if .Params.image }}
                 {{ $image := .Resources.GetMatch .Params.image }}
                 {{ if $image }}
-                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}">
+                {{ if eq $image.MediaType.SubType "svg" }}
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
                 {{ else }}
-                <img src="{{ .Params.image }}" alt="{{ .Title }}">
+                {{ $resized := $image.Resize "600x600 webp q80" }}
+                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
+                {{ end }}
+                {{ else }}
+                <img src="{{ .Params.image }}" alt="{{ .Title }}" loading="lazy">
                 {{ end }}
                 {{ end }}
             </a>

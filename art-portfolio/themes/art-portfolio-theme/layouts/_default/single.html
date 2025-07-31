@@ -13,8 +13,14 @@
             {{ $image := .Resources.GetMatch .Params.image }}
             {{ if $image }}
             <div class="image-container">
+                {{ if eq $image.MediaType.SubType "svg" }}
                 <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
-                    data-full-res="{{ $image.RelPermalink }}">
+                    data-full-res="{{ $image.RelPermalink }}" loading="lazy">
+                {{ else }}
+                {{ $resized := $image.Resize "1200x1200 webp q85" }}
+                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
+                    data-full-res="{{ $image.RelPermalink }}" loading="lazy">
+                {{ end }}
                 <div class="image-overlay">
                     <span class="zoom-icon">🔍</span>
                     <span class="zoom-text">Click to view full resolution</span>
@@ -22,7 +28,8 @@
             </div>
             {{ else }}
             <div class="image-container">
-                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="clickable-image" data-full-res="{{ .Params.image }}">
+                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="clickable-image" data-full-res="{{ .Params.image }}"
+                    loading="lazy">
                 <div class="image-overlay">
                     <span class="zoom-icon">🔍</span>
                     <span class="zoom-text">Click to view full resolution</span>
@@ -39,15 +46,21 @@
                 {{ $additionalImage := $.Resources.GetMatch . }}
                 {{ if $additionalImage }}
                 <div class="image-container">
+                    {{ if eq $additionalImage.MediaType.SubType "svg" }}
                     <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="clickable-image"
-                        data-full-res="{{ $additionalImage.RelPermalink }}">
+                        data-full-res="{{ $additionalImage.RelPermalink }}" loading="lazy">
+                    {{ else }}
+                    {{ $resized := $additionalImage.Resize "800x800 webp q80" }}
+                    <img src="{{ $resized.RelPermalink }}" alt="{{ $.Title }}" class="clickable-image"
+                        data-full-res="{{ $additionalImage.RelPermalink }}" loading="lazy">
+                    {{ end }}
                     <div class="image-overlay">
                         <span class="zoom-icon">🔍</span>
                     </div>
                 </div>
                 {{ else }}
                 <div class="image-container">
-                    <img src="{{ . }}" alt="{{ $.Title }}" class="clickable-image" data-full-res="{{ . }}">
+                    <img src="{{ . }}" alt="{{ $.Title }}" class="clickable-image" data-full-res="{{ . }}" loading="lazy">
                     <div class="image-overlay">
                         <span class="zoom-icon">🔍</span>
                     </div>

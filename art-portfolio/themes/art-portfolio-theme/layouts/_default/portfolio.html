@@ -1,24 +1,11 @@
 {{ define "main" }}
-<div class="portfolio-container">
-    <div class="portfolio-header">
-        <h1>{{ .Title }}</h1>
-        <p class="portfolio-description">{{ .Description }}</p>
-    </div>
-    
-    <div class="portfolio-content">
-        {{ .Content }}
-    </div>
-    
+<div class="portfolio-grid-container">
     <div class="portfolio-grid">
         {{ range .Pages }}
         <div class="portfolio-item">
             <a href="{{ .RelPermalink }}">
                 {{ if .Params.image }}
                 <img src="{{ .Params.image }}" alt="{{ .Title }}">
-                {{ end }}
-                <h3>{{ .Title }}</h3>
-                {{ if .Params.description }}
-                <p>{{ .Params.description }}</p>
                 {{ end }}
             </a>
         </div>

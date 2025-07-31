@@ -4,10 +4,11 @@ A Hugo-based portfolio website for photography and digital art, similar to Kim Ã
 
 ## Features
 
-- Clean, minimal design
+- Clean, minimal design inspired by Kim Ã–hrling's portfolio
 - Two main sections: Photography and Digital Art
-- Responsive layout
-- Easy to add new portfolio items
+- Image-only grid layout for category pages
+- Detailed project pages with multiple images and text
+- Responsive design that adapts to all screen sizes
 - Custom Hugo theme
 
 ## Structure
@@ -55,6 +56,7 @@ Create new files in `content/photography/` with the following front matter:
 title: "Your Photo Title"
 description: "Brief description of the photo"
 image: "/images/your-photo.jpg"
+additional_images: ["/images/your-photo-2.jpg", "/images/your-photo-3.jpg"]
 date: 2024-01-01
 ---
 
@@ -63,6 +65,11 @@ Your content here...
 
 ### Digital Art Items
 Create new files in `content/digital-art/` with the same front matter structure.
+
+### Project Structure
+- **Category Pages**: Show only images in a responsive grid
+- **Project Pages**: Display main image, additional gallery images, and descriptive text
+- **Navigation**: Clean back links to return to category pages
 
 ## Customization
 

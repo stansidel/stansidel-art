@@ -23,6 +23,7 @@ cat > "$CONTENT_FILE" << EOF
 title: "$TITLE"
 description: "$DESCRIPTION"
 image: "/images/$IMAGE_NAME.jpg"
+additional_images: ["/images/$IMAGE_NAME-2.jpg", "/images/$IMAGE_NAME-3.jpg"]
 date: $DATE
 ---
 

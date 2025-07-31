@@ -1,26 +1,35 @@
 {{ define "main" }}
-<div class="single-container">
-    <div class="single-header">
+<div class="project-container">
+    <div class="project-header">
         <h1>{{ .Title }}</h1>
         {{ if .Params.description }}
-        <p class="single-description">{{ .Params.description }}</p>
-        {{ end }}
-        {{ if .Date }}
-        <p class="single-date">{{ .Date.Format "January 2, 2006" }}</p>
+        <p class="project-description">{{ .Params.description }}</p>
         {{ end }}
     </div>
     
-    {{ if .Params.image }}
-    <div class="single-image">
-        <img src="{{ .Params.image }}" alt="{{ .Title }}">
+    <div class="project-images">
+        {{ if .Params.image }}
+        <div class="project-main-image">
+            <img src="{{ .Params.image }}" alt="{{ .Title }}">
+        </div>
+        {{ end }}
+        
+        {{ if .Params.additional_images }}
+        <div class="project-gallery">
+            {{ range .Params.additional_images }}
+            <div class="gallery-item">
+                <img src="{{ . }}" alt="{{ $.Title }}">
+            </div>
+            {{ end }}
+        </div>
+        {{ end }}
     </div>
-    {{ end }}
     
-    <div class="single-content">
+    <div class="project-content">
         {{ .Content }}
     </div>
     
-    <div class="single-navigation">
+    <div class="project-navigation">
         <a href="{{ .Parent.RelPermalink }}" class="back-link">← Back to {{ .Parent.Title }}</a>
     </div>
 </div>

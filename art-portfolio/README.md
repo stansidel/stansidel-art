@@ -64,6 +64,27 @@ art-portfolio/
    hugo
    ```
 
+## Deployment
+
+### GitHub Pages (Recommended)
+
+This site is configured for automatic deployment to GitHub Pages:
+
+1. **Enable GitHub Pages** in your repository settings
+2. **Push to main branch** - the site will automatically deploy
+3. **Access your site** at `https://[username].github.io/art.stansidel/`
+
+For detailed setup instructions, see [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md).
+
+### Manual Deployment
+
+Use the included deployment script:
+```bash
+./deploy.sh
+```
+
+This builds the site and prepares it for manual upload to your web server.
+
 ## Adding New Portfolio Items
 
 ### Photography Items

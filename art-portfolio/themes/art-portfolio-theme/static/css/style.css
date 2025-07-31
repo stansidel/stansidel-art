@@ -99,7 +99,6 @@ main {
 footer {
     padding: 2rem 0;
     border-top: 1px solid #eee;
-    text-align: center;
     color: #666;
 }
 
@@ -107,7 +106,53 @@ footer {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
-}
+    display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .footer-section {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .footer-section:first-child {
+        text-align: left;
+    }
+    
+    .footer-section:last-child {
+        text-align: right;
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: flex-end;
+    }
+    
+    .social-link {
+        text-decoration: none;
+        color: #666;
+        transition: color 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    
+    .social-link:hover {
+        color: #333;
+    }
+    
+    .social-icon {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s ease;
+    }
+    
+    .social-link:hover .social-icon {
+        transform: scale(1.1);
+    
 
 /* Project page styles */
 .project-container {
@@ -359,6 +404,7 @@ footer {
     .project-gallery {
         gap: 1.5rem;
     }
+    
                 .close-modal {
                     top: 10px;
                     right: 20px;
@@ -392,5 +438,20 @@ footer {
         
                 .gallery-item .zoom-icon {
                     font-size: 1.2rem;
+                }
+                /* Mobile footer adjustments */
+                .footer-content {
+                    flex-direction: column;
+                    text-align: center;
+                    gap: 1.5rem;
+                }
+        
+                .footer-section {
+                    text-align: center !important;
+                    min-width: auto;
+                }
+        
+                .social-links {
+                    justify-content: center;
                 }
 } 

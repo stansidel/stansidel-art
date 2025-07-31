@@ -36,9 +36,7 @@
     </main>
 
     <footer>
-        <div class="footer-content">
-            <p>&copy; {{ now.Year }} {{ .Site.Params.author | default .Site.Title }}</p>
-        </div>
+        {{ partial "footer.html" . }}
     </footer>
 </body>
 </html>

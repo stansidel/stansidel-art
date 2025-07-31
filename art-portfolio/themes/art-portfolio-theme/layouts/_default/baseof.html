@@ -14,7 +14,8 @@
                 <a href="{{ .Site.BaseURL }}" class="logo">{{ .Site.Title }}</a>
                 <ul class="nav-menu">
                     {{ range .Site.Menus.main }}
-                    <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+                    <li><a href="{{ .URL }}" {{ if or (eq $.RelPermalink .URL) (hasPrefix $.RelPermalink .URL) (and $.IsHome (eq .Weight 1))
+                            }}style="font-weight: bold;" {{ end }}>{{ .Name }}</a></li>
                     {{ end }}
                 </ul>
             </div>

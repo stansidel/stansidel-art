@@ -1,6 +1,6 @@
 baseURL = 'https://art.stan.sidel.family/'
 languageCode = 'en-us'
-title = 'Stan Sidel - Art Portfolio'
+title = "Stan Sidel's Art"
 theme = 'art-portfolio-theme'
 
 [params]

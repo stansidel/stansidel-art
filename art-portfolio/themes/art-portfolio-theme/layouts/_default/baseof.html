@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
     <meta name="description" content="{{ .Description | default .Site.Params.description }}">
+    {{ if .IsHome }}
+    {{ $firstCategory := index .Site.Menus.main 0 }}
+    <link rel="canonical" href="{{ $firstCategory.URL | absURL }}">
+    {{ else }}
+    <link rel="canonical" href="{{ .Permalink }}">
+    {{ end }}
     <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
 <body>

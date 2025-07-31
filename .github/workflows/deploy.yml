@@ -48,7 +48,7 @@ jobs:
           hugo \
             --gc \
             --minify \
-            --config config.toml,config.github.toml \
+            --config config.toml,config.toml \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
             
       - name: Upload artifact

@@ -55,67 +55,7 @@ main {
     min-height: calc(100vh - 200px);
 }
 
-/* Home page styles */
-.home-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 4rem 2rem;
-}
-
-.hero {
-    text-align: center;
-    margin-bottom: 4rem;
-}
-
-.hero h1 {
-    font-size: 3rem;
-    font-weight: 300;
-    margin-bottom: 1rem;
-    color: #333;
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: #666;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.portfolio-sections {
-    margin-top: 4rem;
-}
-
-.section-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-}
-
-.section-card {
-    padding: 2rem;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.section-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.section-card h2 {
-    margin-bottom: 1rem;
-}
-
-.section-card h2 a {
-    text-decoration: none;
-    color: #333;
-}
-
-.section-card p {
-    color: #666;
-}
-
+/* Home page styles - now uses same full-width layout as category pages */
 /* Portfolio page styles */
 .portfolio-grid-container {
     padding: 0;

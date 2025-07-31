@@ -12,9 +12,22 @@
         <div class="project-main-image">
             {{ $image := .Resources.GetMatch .Params.image }}
             {{ if $image }}
-            <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}">
+            <div class="image-container">
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
+                    data-full-res="{{ $image.RelPermalink }}">
+                <div class="image-overlay">
+                    <span class="zoom-icon">🔍</span>
+                    <span class="zoom-text">Click to view full resolution</span>
+                </div>
+            </div>
             {{ else }}
-            <img src="{{ .Params.image }}" alt="{{ .Title }}">
+            <div class="image-container">
+                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="clickable-image" data-full-res="{{ .Params.image }}">
+                <div class="image-overlay">
+                    <span class="zoom-icon">🔍</span>
+                    <span class="zoom-text">Click to view full resolution</span>
+                </div>
+            </div>
             {{ end }}
         </div>
         {{ end }}
@@ -25,9 +38,20 @@
             <div class="gallery-item">
                 {{ $additionalImage := $.Resources.GetMatch . }}
                 {{ if $additionalImage }}
-                <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}">
+                <div class="image-container">
+                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="clickable-image"
+                        data-full-res="{{ $additionalImage.RelPermalink }}">
+                    <div class="image-overlay">
+                        <span class="zoom-icon">🔍</span>
+                    </div>
+                </div>
                 {{ else }}
-                <img src="{{ . }}" alt="{{ $.Title }}">
+                <div class="image-container">
+                    <img src="{{ . }}" alt="{{ $.Title }}" class="clickable-image" data-full-res="{{ . }}">
+                    <div class="image-overlay">
+                        <span class="zoom-icon">🔍</span>
+                    </div>
+                </div>
                 {{ end }}
             </div>
             {{ end }}
@@ -43,4 +67,50 @@
         <a href="{{ .Parent.RelPermalink }}" class="back-link">← Back to {{ .Parent.Title }}</a>
     </div>
 </div>
+<!-- Full Resolution Image Modal -->
+<div id="imageModal" class="image-modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <img id="modalImage" src="" alt="Full resolution image">
+        <div class="modal-caption"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const modalCaption = document.querySelector('.modal-caption');
+        const closeBtn = document.querySelector('.close-modal');
+        const clickableImages = document.querySelectorAll('.clickable-image');
+
+        // Open modal when image is clicked
+        clickableImages.forEach((img, index) => {
+            img.addEventListener('click', function () {
+                modal.style.display = 'block';
+                modalImg.src = this.getAttribute('data-full-res');
+                modalCaption.textContent = this.alt;
+            });
+        });
+
+        // Close modal when clicking the close button
+        closeBtn.addEventListener('click', function () {
+            modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                modal.style.display = 'none';
+            }
+        });
+    });
+</script>
 {{ end }}

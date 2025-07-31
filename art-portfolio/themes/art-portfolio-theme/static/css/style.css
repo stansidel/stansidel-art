@@ -149,16 +149,21 @@ footer {
 }
 
 .project-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
+    display: flex;
+        flex-direction: column;
+        gap: 2rem;
     margin-top: 2rem;
 }
 
-.gallery-item img {
+.gallery-item {
     width: 100%;
+    text-align: center;
+}
+.gallery-item img {
+    max-width: 100%;
     height: auto;
     display: block;
+    margin: 0 auto;
 }
 
 /* Clickable images */
@@ -352,7 +357,7 @@ footer {
     }
     
     .project-gallery {
-        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
                 .close-modal {
                     top: 10px;

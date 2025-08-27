@@ -93,6 +93,33 @@ extract_date_from_filename() {
     return 1
 }
 
+# Function to extract photo metadata using exiftool
+extract_photo_metadata() {
+    local image_file="$1"
+    
+    # Check if exiftool is available
+    if ! command -v exiftool &> /dev/null; then
+        echo "⚠️  exiftool not found - metadata extraction disabled"
+        return 1
+    fi
+    
+    # Extract metadata fields individually
+    local title=$(exiftool -Title -b "$image_file" 2>/dev/null)
+    local description=$(exiftool -Description -b "$image_file" 2>/dev/null)
+    local caption=$(exiftool -Caption-Abstract -b "$image_file" 2>/dev/null)
+    local make=$(exiftool -Make -b "$image_file" 2>/dev/null)
+    local model=$(exiftool -"Camera Model Name" -b "$image_file" 2>/dev/null)
+    local focal_length=$(exiftool -FocalLength -b "$image_file" 2>/dev/null)
+    local f_number=$(exiftool -FNumber -b "$image_file" 2>/dev/null)
+    local exposure_time=$(exiftool -ExposureTime -b "$image_file" 2>/dev/null)
+    local metering_mode=$(exiftool -MeteringMode -b "$image_file" 2>/dev/null)
+    local iso=$(exiftool -ISO -b "$image_file" 2>/dev/null)
+    local date_time=$(exiftool -DateTimeOriginal -b "$image_file" 2>/dev/null)
+    
+    # Return metadata as a structured string
+    echo "TITLE:$title|DESCRIPTION:$description|CAPTION:$caption|MAKE:$make|MODEL:$model|FOCAL:$focal_length|FNUMBER:$f_number|EXPOSURE:$exposure_time|METERING:$metering_mode|ISO:$iso|DATETIME:$date_time"
+}
+
 # Function to clean filename (replace special chars with underscores)
 clean_filename() {
     local filename="$1"
@@ -123,33 +150,6 @@ generate_title() {
     fi
     
     echo "$title"
-}
-
-# Function to extract photo metadata using exiftool
-extract_photo_metadata() {
-    local image_file="$1"
-    
-    # Check if exiftool is available
-    if ! command -v exiftool &> /dev/null; then
-        echo "⚠️  exiftool not found - metadata extraction disabled"
-        return 1
-    fi
-    
-    # Extract metadata fields individually
-    local title=$(exiftool -Title -b "$image_file" 2>/dev/null)
-    local description=$(exiftool -Description -b "$image_file" 2>/dev/null)
-    local caption=$(exiftool -Caption-Abstract -b "$image_file" 2>/dev/null)
-    local make=$(exiftool -Make -b "$image_file" 2>/dev/null)
-    local model=$(exiftool -Model -b "$image_file" 2>/dev/null)
-    local focal_length=$(exiftool -FocalLength -b "$image_file" 2>/dev/null)
-    local f_number=$(exiftool -FNumber -b "$image_file" 2>/dev/null)
-    local exposure_time=$(exiftool -ExposureTime -b "$image_file" 2>/dev/null)
-    local metering_mode=$(exiftool -MeteringMode -b "$image_file" 2>/dev/null)
-    local iso=$(exiftool -ISO -b "$image_file" 2>/dev/null)
-    local date_time=$(exiftool -DateTimeOriginal -b "$image_file" 2>/dev/null)
-    
-    # Return metadata as a structured string
-    echo "TITLE:$title|DESCRIPTION:$description|CAPTION:$caption|MAKE:$make|MODEL:$model|FOCAL:$focal_length|FNUMBER:$f_number|EXPOSURE:$exposure_time|METERING:$metering_mode|ISO:$iso|DATETIME:$date_time"
 }
 
 # Function to generate description from title
@@ -224,7 +224,7 @@ for image_file in "${IMAGE_FILES[@]}"; do
             echo "   🏷️  Generated title: $title"
         fi
         
-        # Use photo description/caption if available and meaningful, otherwise generate
+        # Use photo description/caption if available and meaningful, otherwise leave empty
         if [ -n "$photo_description" ] && [ "$photo_description" != "$camera_make" ] && [ "$photo_description" != "$camera_model" ]; then
             description="$photo_description"
             echo "   📝 Using photo description: $description"
@@ -232,8 +232,8 @@ for image_file in "${IMAGE_FILES[@]}"; do
             description="$photo_caption"
             echo "   📝 Using photo caption: $description"
         else
-            description=$(generate_description "$title")
-            echo "   📝 Generated description: $description"
+            description=""
+            echo "   📝 No description found - leaving empty"
         fi
         
         # Use photo date if available, otherwise try filename, fallback to current date
@@ -263,11 +263,11 @@ for image_file in "${IMAGE_FILES[@]}"; do
     else
         # Fallback to basic extraction if metadata extraction fails
         title=$(generate_title "$original_filename")
-        description=$(generate_description "$title")
+        description=""
         
         if extracted_date=$(extract_date_from_filename "$original_filename"); then
             date="$extracted_date"
-            echo "   📅 Extracted date from filename: $date"
+            echo "   📅 Using filename date: $date"
         else
             date=$(date +%Y-%m-%d)
             echo "   📅 Using current date: $date"
@@ -284,44 +284,104 @@ date: $date
 draft: true
 ---
 
-$description
-
 EOF
+
+# Add description to post body only if it exists
+if [ -n "$description" ]; then
+    echo "$description" >> "$BUNDLE_DIR/index.md"
+    echo "" >> "$BUNDLE_DIR/index.md"
+fi
     
     # Add technical details if available
-    if [ -n "$camera_make" ] || [ -n "$camera_model" ] || [ -n "$focal_length" ] || [ -n "$f_number" ] || [ -n "$exposure_time" ] || [ -n "$metering_mode" ] || [ -n "$iso" ]; then
+    if [ -n "$camera_make" ] || [ -n "$camera_model" ] || [ -n "$focal_length" ] || [ -n "$f_number" ] || [ -n "$exposure_time" ] || [ -n "$iso" ]; then
         cat >> "$BUNDLE_DIR/index.md" << EOF
 
 ## Technical Details
 
 EOF
         
+        # Build technical details in standard photography format: Camera | Focal Length | Aperture | Exposure | ISO
+        local tech_details=""
+        
+        # Camera
         if [ -n "$camera_make" ] && [ -n "$camera_model" ]; then
-            echo "- **Camera:** $camera_make $camera_model" >> "$BUNDLE_DIR/index.md"
+            # Clean up redundant camera information
+            local clean_make=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+            local clean_model=$(echo "$camera_model" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+            
+            # Check if model already contains the cleaned make
+            if [[ "$clean_model" == *"$clean_make"* ]]; then
+                # If model contains make, use only the model
+                tech_details="$clean_model"
+            elif [ -n "$clean_make" ] && [ "$clean_make" != "$clean_model" ] && [ ${#clean_make} -gt 2 ]; then
+                # Use both if they're genuinely different and make is substantial (more than 2 chars)
+                tech_details="$clean_make $clean_model"
+            else
+                # Fallback to just the model
+                tech_details="$clean_model"
+            fi
         elif [ -n "$camera_make" ]; then
-            echo "- **Camera:** $camera_make" >> "$BUNDLE_DIR/index.md"
+            # Clean up make if it's the only camera info
+            tech_details=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
         elif [ -n "$camera_model" ]; then
-            echo "- **Camera:** $camera_model" >> "$BUNDLE_DIR/index.md"
+            tech_details="$camera_model"
         fi
         
+        # Focal Length
         if [ -n "$focal_length" ] && [ "$focal_length" != "0" ] && [ "$focal_length" != "0.005714285714" ]; then
-            echo "- **Focal Length:** $focal_length mm" >> "$BUNDLE_DIR/index.md"
+            if [ -n "$tech_details" ]; then
+                tech_details="$tech_details | $focal_length mm"
+            else
+                tech_details="$focal_length mm"
+            fi
         fi
         
+        # Aperture
         if [ -n "$f_number" ] && [ "$f_number" != "0" ] && [ "$f_number" != "0.005714285714" ]; then
-            echo "- **Aperture:** f/$f_number" >> "$BUNDLE_DIR/index.md"
+            if [ -n "$tech_details" ]; then
+                tech_details="$tech_details | f/$f_number"
+            else
+                tech_details="f/$f_number"
+            fi
         fi
         
+        # Exposure
         if [ -n "$exposure_time" ] && [ "$exposure_time" != "0" ] && [ "$exposure_time" != "0.005714285714" ]; then
-            echo "- **Exposure:** $exposure_time" >> "$BUNDLE_DIR/index.md"
+            local exposure_formatted=""
+            if [[ "$exposure_time" =~ ^[0-9]+/[0-9]+$ ]]; then
+                exposure_formatted="$exposure_time"
+            elif [[ "$exposure_time" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+                # Convert decimal to fraction (e.g., 0.01666666667 -> 1/60)
+                local exposure_fraction=$(awk "BEGIN {printf \"1/%.0f\", 1/$exposure_time}")
+                # Handle very long exposures (over 1 second)
+                if (( $(echo "$exposure_time >= 1" | bc -l 2>/dev/null || echo "0") )); then
+                    exposure_formatted="${exposure_time}s"
+                else
+                    exposure_formatted="$exposure_fraction"
+                fi
+            else
+                exposure_formatted="$exposure_time"
+            fi
+            
+            if [ -n "$tech_details" ]; then
+                tech_details="$tech_details | $exposure_formatted"
+            else
+                tech_details="$exposure_formatted"
+            fi
         fi
         
+        # ISO
         if [ -n "$iso" ] && [ "$iso" != "0" ] && [ "$iso" != "0.005714285714" ]; then
-            echo "- **ISO:** $iso" >> "$BUNDLE_DIR/index.md"
+            if [ -n "$tech_details" ]; then
+                tech_details="$tech_details | ISO $iso"
+            else
+                tech_details="ISO $iso"
+            fi
         fi
         
-        if [ -n "$metering_mode" ] && [ "$metering_mode" != "0" ] && [ "$metering_mode" != "0.005714285714" ]; then
-            echo "- **Metering Mode:** $metering_mode" >> "$BUNDLE_DIR/index.md"
+        # Output the combined technical details
+        if [ -n "$tech_details" ]; then
+            echo "$tech_details" >> "$BUNDLE_DIR/index.md"
         fi
     fi
     

@@ -121,6 +121,18 @@ digital-art:~/Artwork/abstract:Abstract Art
 photography:~/Pictures/street:Street Photography
 ```
 
+**Example Technical Details Output:**
+```
+## Technical Details
+
+Apple iPhone 13 | 5.1 mm | f/1.6 | 1/175 | ISO 40
+```
+
+**Camera Cleanup Examples:**
+- **Before:** `NIKON CORPORATION NIKON D5100` → **After:** `NIKON D5100`
+- **Before:** `CANON INC. EOS R5` → **After:** `CANON EOS R5`
+- **Before:** `SONY CORPORATION ILCE-7RM4` → **After:** `SONY ILCE-7RM4`
+
 ## What Gets Created
 
 For each photo, the script creates:
@@ -146,21 +158,27 @@ The script automatically extracts rich metadata from your photos using `exiftool
 
 ### **Content Fields:**
 - **Title:** Used as the Hugo post title (if available in photo metadata)
-- **Description/Caption:** Placed in the post body
+- **Description/Caption:** Placed in the post body (only if found in photo metadata)
 - **Date:** Extracted from photo's original capture date
 
 ### **Technical Details (added to post bottom):**
-- **Camera:** Make and model
-- **Focal Length:** Lens focal length
-- **Aperture:** f-number
-- **Exposure Time:** Shutter speed
-- **ISO:** Film/sensor sensitivity
-- **Metering Mode:** How the camera metered the scene
+- **Single-line format:** Camera | Focal Length | Aperture | Exposure | ISO
+- **Professional layout:** Follows standard photography industry conventions
+- **Clean presentation:** All technical details on one line for easy reading
+- **Smart formatting:** Exposure times as fractions (1/60, 1/500), long exposures as seconds (2s, 5s)
 
 ### **Metadata Priority:**
 1. **Photo metadata** (from EXIF/IPTC data)
 2. **Filename date** (YYYYMMDD/YYMMDD format)
 3. **Generated content** (fallback options)
+
+### **Smart Formatting:**
+- **Exposure times** are converted from decimals to readable fractions (1/60, 1/500, 1/8)
+- **Long exposures** (≥1 second) are shown with "s" suffix (2s, 5s)
+- **Metering modes** are converted from numeric codes to human-readable names
+- **Technical values** are filtered to remove invalid or meaningless data
+- **Descriptions** are only included when found in photo metadata (no generic text generated)
+- **Camera info cleanup** removes redundant corporate suffixes (CORPORATION, INC, LTD, LLC, CO) and handles overlapping make/model text
 
 ## Safety Features
 

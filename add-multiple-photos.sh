@@ -125,6 +125,8 @@ extract_photo_metadata() {
     local iso=$(exiftool -ISO -b "$image_file" 2>/dev/null)
     local date_time=$(exiftool -DateTimeOriginal -b "$image_file" 2>/dev/null)
     
+
+    
     # Return metadata as a structured string
     echo "TITLE:$title|DESCRIPTION:$description|CAPTION:$caption|MAKE:$make|MODEL:$model|FOCAL:$focal_length|FNUMBER:$f_number|EXPOSURE:$exposure_time|METERING:$metering_mode|ISO:$iso|DATETIME:$date_time"
 }
@@ -312,13 +314,13 @@ fi
 EOF
         
         # Build technical details in standard photography format: Camera | Focal Length | Aperture | Exposure | ISO
-        local tech_details=""
+        tech_details=""
         
         # Camera
         if [ -n "$camera_make" ] && [ -n "$camera_model" ]; then
             # Clean up redundant camera information more carefully
-            local clean_make=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
-            local clean_model=$(echo "$camera_model" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+            clean_make=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+            clean_model=$(echo "$camera_model" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
             
             # Check if model already contains the cleaned make (case-insensitive)
             if [[ "$(echo "$clean_model" | tr '[:upper:]' '[:lower:]')" == *"$(echo "$clean_make" | tr '[:upper:]' '[:lower:]')"* ]]; then
@@ -358,12 +360,12 @@ EOF
         
         # Exposure
         if [ -n "$exposure_time" ] && [ "$exposure_time" != "0" ]; then
-            local exposure_formatted=""
+            exposure_formatted=""
             if [[ "$exposure_time" =~ ^[0-9]+/[0-9]+$ ]]; then
                 exposure_formatted="$exposure_time"
             elif [[ "$exposure_time" =~ ^[0-9]+\.?[0-9]*$ ]]; then
                 # Convert decimal to fraction (e.g., 0.01666666667 -> 1/60)
-                local exposure_fraction=$(awk "BEGIN {printf \"1/%.0f\", 1/$exposure_time}")
+                exposure_fraction=$(awk "BEGIN {printf \"1/%.0f\", 1/$exposure_time}")
                 # Handle very long exposures (over 1 second)
                 if (( $(echo "$exposure_time >= 1" | bc -l 2>/dev/null || echo "0") )); then
                     exposure_formatted="${exposure_time}s"

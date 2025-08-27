@@ -309,8 +309,6 @@ fi
     if [ -n "$camera_make" ] || [ -n "$camera_model" ] || [ -n "$focal_length" ] || [ -n "$f_number" ] || [ -n "$exposure_time" ] || [ -n "$iso" ]; then
         cat >> "$BUNDLE_DIR/index.md" << EOF
 
-## Technical Details
-
 EOF
         
         # Build technical details in standard photography format: Camera | Focal Length | Aperture | Exposure | ISO

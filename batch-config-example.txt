@@ -1,0 +1,16 @@
+# Batch upload configuration file
+# Format: CATEGORY:PHOTOS_DIRECTORY:TITLE_PREFIX
+# Lines starting with # are comments and will be ignored
+# Empty lines are also ignored
+
+# Photography portfolio
+photography:~/Pictures/portfolio:Photography
+
+# Abstract digital art
+digital-art:~/Artwork/abstract:Abstract Art
+
+# Street photography collection
+photography:~/Pictures/street:Street Photography
+
+# Digital illustrations
+digital-art:~/Artwork/illustrations:Digital Illustration

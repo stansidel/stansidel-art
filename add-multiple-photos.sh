@@ -108,7 +108,16 @@ extract_photo_metadata() {
     local description=$(exiftool -Description -b "$image_file" 2>/dev/null)
     local caption=$(exiftool -Caption-Abstract -b "$image_file" 2>/dev/null)
     local make=$(exiftool -Make -b "$image_file" 2>/dev/null)
+    
+    # Try to get camera model from multiple possible fields
     local model=$(exiftool -"Camera Model Name" -b "$image_file" 2>/dev/null)
+    if [ -z "$model" ]; then
+        model=$(exiftool -Model -b "$image_file" 2>/dev/null)
+    fi
+    if [ -z "$model" ]; then
+        model=$(exiftool -"Model Name" -b "$image_file" 2>/dev/null)
+    fi
+    
     local focal_length=$(exiftool -FocalLength -b "$image_file" 2>/dev/null)
     local f_number=$(exiftool -FNumber -b "$image_file" 2>/dev/null)
     local exposure_time=$(exiftool -ExposureTime -b "$image_file" 2>/dev/null)
@@ -215,6 +224,8 @@ for image_file in "${IMAGE_FILES[@]}"; do
         iso=$(echo "$metadata_output" | grep -o 'ISO:[^|]*' | cut -d: -f2)
         photo_date_time=$(echo "$metadata_output" | grep -o 'DATETIME:[^|]*' | cut -d: -f2)
         
+
+        
         # Use photo title if available and meaningful, otherwise generate from filename
         if [ -n "$photo_title" ] && [ "$photo_title" != "$camera_make" ] && [ "$photo_title" != "$camera_model" ]; then
             title="$photo_title"
@@ -305,12 +316,12 @@ EOF
         
         # Camera
         if [ -n "$camera_make" ] && [ -n "$camera_model" ]; then
-            # Clean up redundant camera information
+            # Clean up redundant camera information more carefully
             local clean_make=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
             local clean_model=$(echo "$camera_model" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
             
-            # Check if model already contains the cleaned make
-            if [[ "$clean_model" == *"$clean_make"* ]]; then
+            # Check if model already contains the cleaned make (case-insensitive)
+            if [[ "$(echo "$clean_model" | tr '[:upper:]' '[:lower:]')" == *"$(echo "$clean_make" | tr '[:upper:]' '[:lower:]')"* ]]; then
                 # If model contains make, use only the model
                 tech_details="$clean_model"
             elif [ -n "$clean_make" ] && [ "$clean_make" != "$clean_model" ] && [ ${#clean_make} -gt 2 ]; then
@@ -321,7 +332,7 @@ EOF
                 tech_details="$clean_model"
             fi
         elif [ -n "$camera_make" ]; then
-            # Clean up make if it's the only camera info
+            # Clean up make if it's the only camera info, but preserve case
             tech_details=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
         elif [ -n "$camera_model" ]; then
             tech_details="$camera_model"
@@ -346,7 +357,7 @@ EOF
         fi
         
         # Exposure
-        if [ -n "$exposure_time" ] && [ "$exposure_time" != "0" ] && [ "$exposure_time" != "0.005714285714" ]; then
+        if [ -n "$exposure_time" ] && [ "$exposure_time" != "0" ]; then
             local exposure_formatted=""
             if [[ "$exposure_time" =~ ^[0-9]+/[0-9]+$ ]]; then
                 exposure_formatted="$exposure_time"

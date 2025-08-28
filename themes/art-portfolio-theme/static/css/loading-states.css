@@ -158,3 +158,32 @@
         height: 25px;
     }
 }
+
+/* Modern forced colors mode support (replaces deprecated -ms-high-contrast) */
+@media (forced-colors: active) {
+    .image-loading {
+        background: Canvas;
+        border: 1px solid CanvasText;
+    }
+    
+    .image-placeholder {
+        background: Canvas;
+        border: 2px dashed CanvasText;
+        color: CanvasText;
+    }
+    
+    .image-error {
+        background: Mark;
+        border: 2px dashed MarkText;
+        color: MarkText;
+    }
+    
+    .loading-spinner {
+        border-color: CanvasText;
+        border-top-color: Highlight;
+    }
+    
+    .loading-text {
+        color: CanvasText;
+    }
+}

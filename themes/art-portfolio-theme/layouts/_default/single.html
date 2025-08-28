@@ -131,8 +131,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to create a low-quality placeholder
     function createPlaceholder(img) {
         const container = img.closest('.progressive-image');
-        if (container && !img.dataset.imageType === 'svg') {
+        if (container && img.dataset.imageType !== 'svg') {
             container.classList.add('loading');
+        }
+    }
+
+    // Function to handle cached images without loading state
+    function handleCachedImage(img, overlay) {
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        
+        const container = img.closest('.progressive-image');
+        if (container) {
+            container.classList.remove('loading');
+            container.classList.add('cached', 'loaded');
+            img.classList.add('image-fade-in');
         }
     }
     
@@ -154,12 +168,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         // If image is already loaded (from cache), handle it immediately
-        if (img.complete) {
-            if (img.naturalWidth > 0) {
-                handleImageLoad(img, overlay);
-            } else {
-                handleImageError(img, overlay);
-            }
+        if (img.complete && img.naturalWidth > 0) {
+            handleCachedImage(img, overlay);
+        } else if (img.complete && img.naturalWidth === 0) {
+            handleImageError(img, overlay);
         }
     });
     

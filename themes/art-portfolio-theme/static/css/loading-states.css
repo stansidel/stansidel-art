@@ -187,3 +187,24 @@
         color: CanvasText;
     }
 }
+
+/* Prevent loading animations for cached images */
+.progressive-image.cached img {
+    filter: blur(0) !important;
+    transform: scale(1) !important;
+    animation: none !important;
+}
+
+.progressive-image.cached .image-loading-overlay {
+    display: none !important;
+}
+
+/* Instant loading for cached images */
+.progressive-image.cached {
+    animation: none !important;
+}
+
+.progressive-image.cached img {
+    opacity: 1 !important;
+    transition: none !important;
+}

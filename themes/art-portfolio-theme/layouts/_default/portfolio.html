@@ -94,12 +94,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         // If image is already loaded (from cache), handle it immediately
-        if (img.complete) {
-            if (img.naturalWidth > 0) {
-                handlePortfolioImageLoad(img, overlay);
-            } else {
-                handlePortfolioImageError(img, overlay);
+        if (img.complete && img.naturalWidth > 0) {
+            // Handle cached images without loading state
+            if (overlay) {
+                overlay.style.display = 'none';
             }
+            
+            const container = img.closest('.progressive-image');
+            if (container) {
+                container.classList.remove('loading');
+                container.classList.add('cached', 'loaded');
+                img.classList.add('image-fade-in');
+            }
+        } else if (img.complete && img.naturalWidth === 0) {
+            handlePortfolioImageError(img, overlay);
         }
     });
     

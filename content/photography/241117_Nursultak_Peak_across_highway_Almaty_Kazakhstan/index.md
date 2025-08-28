@@ -3,7 +3,7 @@ title: "Nursultak Peak across highway, Almaty, Kazakhstan"
 description: ""
 image: "241117_Nursultak_Peak_across_highway_Almaty_Kazakhstan.jpg"
 date: 2024-11-17
-draft: true
+draft: false
 ---
 
 

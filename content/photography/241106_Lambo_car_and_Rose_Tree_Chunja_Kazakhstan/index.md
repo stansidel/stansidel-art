@@ -3,7 +3,7 @@ title: "Lambo car and Rose Tree, Chunja, Kazakhstan"
 description: ""
 image: "241106_Lambo_car_and_Rose_Tree_Chunja_Kazakhstan.jpg"
 date: 2024-11-06
-draft: true
+draft: false
 ---
 
 

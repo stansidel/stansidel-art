@@ -3,7 +3,7 @@ title: "Sun through car window, Kazakhstan"
 description: ""
 image: "241110_Sun_through_car_window_Kazakhstan.jpg"
 date: 2024-11-10
-draft: true
+draft: false
 ---
 
 

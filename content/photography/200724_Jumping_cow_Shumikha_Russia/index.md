@@ -3,7 +3,7 @@ title: "Jumping cow, Shumikha, Russia"
 description: ""
 image: "200724_Jumping_cow_Shumikha_Russia.jpg"
 date: 2020-07-24
-draft: true
+draft: false
 ---
 
 

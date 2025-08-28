@@ -3,7 +3,7 @@ title: "Crystal Sphere, Shadrinsk, Russia"
 description: ""
 image: "200722_Crystal_Sphere_Shadrinsk_Russia.jpg"
 date: 2020-07-22
-draft: true
+draft: false
 ---
 
 

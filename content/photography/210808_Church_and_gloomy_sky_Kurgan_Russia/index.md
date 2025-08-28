@@ -2,8 +2,8 @@
 title: "Church and gloomy sky, Kurgan, Russia"
 description: ""
 image: "210808_Church_and_gloomy_sky_Kurgan_Russia.jpg"
-date: 2025-08-27
-draft: true
+date: 2021-08-27
+draft: false
 ---
 
 

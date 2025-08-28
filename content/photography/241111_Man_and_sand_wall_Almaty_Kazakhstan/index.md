@@ -3,7 +3,7 @@ title: "Man and sand wall, Almaty, Kazakhstan"
 description: ""
 image: "241111_Man_and_sand_wall_Almaty_Kazakhstan.jpg"
 date: 2024-11-11
-draft: true
+draft: false
 ---
 
 

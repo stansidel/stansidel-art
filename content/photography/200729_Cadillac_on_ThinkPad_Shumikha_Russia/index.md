@@ -3,7 +3,7 @@ title: "Cadillac on ThinkPad, Shumikha, Russia"
 description: ""
 image: "200729_Cadillac_on_ThinkPad_Shumikha_Russia.jpg"
 date: 2020-07-29
-draft: true
+draft: false
 ---
 
 

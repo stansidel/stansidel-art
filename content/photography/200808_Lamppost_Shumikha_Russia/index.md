@@ -2,8 +2,8 @@
 title: "Lamppost, Shumikha, Russia"
 description: ""
 image: "200808_Lamppost_Shumikha_Russia.jpg"
-date: 2025-08-27
-draft: true
+date: 2020-08-27
+draft: false
 ---
 
 

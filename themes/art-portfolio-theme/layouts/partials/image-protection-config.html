@@ -1,0 +1,39 @@
+{{/* 
+Image Protection Configuration
+This partial contains configurable settings for image protection.
+Adjust these values to control image quality and dimensions.
+*/}}
+
+{{/* Main image settings */}}
+{{ $mainImageMaxWidth := "800x" }}
+{{ $mainImageQuality := "q75" }}
+{{ $mainImageFormat := "webp" }}
+
+{{/* Gallery image settings */}}
+{{ $galleryImageMaxSize := "600x600" }}
+{{ $galleryImageQuality := "q70" }}
+{{ $galleryImageFormat := "webp" }}
+
+{{/* Watermark settings */}}
+{{ $watermarkText := .Site.Title }}
+{{ $watermarkSubtext := "Protected Image - Not for Download" }}
+
+{{/* Protection notice text */}}
+{{ $protectionNotice1 := "⚠️ This image is protected and displayed at reduced resolution for web viewing only." }}
+{{ $protectionNotice2 := "For high-resolution prints and licensing, please contact the artist." }}
+
+{{/* Export variables for use in templates */}}
+{{ $imageConfig := dict 
+    "mainImageMaxWidth" $mainImageMaxWidth
+    "mainImageQuality" $mainImageQuality
+    "mainImageFormat" $mainImageFormat
+    "galleryImageMaxSize" $galleryImageMaxSize
+    "galleryImageQuality" $galleryImageQuality
+    "galleryImageFormat" $galleryImageFormat
+    "watermarkText" $watermarkText
+    "watermarkSubtext" $watermarkSubtext
+    "protectionNotice1" $protectionNotice1
+    "protectionNotice2" $protectionNotice2
+}}
+
+{{ return $imageConfig }}

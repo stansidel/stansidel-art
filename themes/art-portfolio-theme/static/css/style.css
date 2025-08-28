@@ -212,14 +212,36 @@ footer {
     margin: 0 auto;
 }
 
+/* Protected images - no longer clickable */
+.protected-image {
+    transition: none;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 /* Clickable images */
 .clickable-image {
     cursor: pointer;
     transition: opacity 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .clickable-image:hover {
     opacity: 0.8;
+}
+
+/* Prevent image selection globally */
+img {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Image container and overlay */

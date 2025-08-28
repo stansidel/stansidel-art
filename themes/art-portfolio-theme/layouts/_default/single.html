@@ -1,4 +1,5 @@
 {{ define "main" }}
+{{ $imageConfig := partial "image-protection-config.html" . }}
 <div class="project-container">
     <div class="project-header">
         <h1>{{ .Title }}</h1>
@@ -14,26 +15,27 @@
             {{ if $image }}
             <div class="image-container">
                 {{ if eq $image.MediaType.SubType "svg" }}
-                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
-                    data-full-res="{{ $image.RelPermalink }}" loading="lazy">
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
                 {{ else }}
-                {{ $resized := $image.Resize "1200x webp q85" }}
-                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="clickable-image"
-                    data-full-res="{{ $image.RelPermalink }}" loading="lazy">
+                {{ $resized := $image.Resize (printf "%s %s %s" $imageConfig.mainImageMaxWidth $imageConfig.mainImageFormat $imageConfig.mainImageQuality) }}
+                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
                 {{ end }}
+                <!-- Image overlay commented out - no larger viewing
                 <div class="image-overlay">
                     <span class="zoom-icon">🔍</span>
-                    <span class="zoom-text">Click to view full resolution</span>
+                    <span class="zoom-text">Click to view larger</span>
                 </div>
+                -->
             </div>
             {{ else }}
             <div class="image-container">
-                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="clickable-image" data-full-res="{{ .Params.image }}"
-                    loading="lazy">
+                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
+                <!-- Image overlay commented out - no larger viewing
                 <div class="image-overlay">
                     <span class="zoom-icon">🔍</span>
-                    <span class="zoom-text">Click to view full resolution</span>
+                    <span class="zoom-text">Click to view larger</span>
                 </div>
+                -->
             </div>
             {{ end }}
         </div>
@@ -47,23 +49,25 @@
                 {{ if $additionalImage }}
                 <div class="image-container">
                     {{ if eq $additionalImage.MediaType.SubType "svg" }}
-                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="clickable-image"
-                        data-full-res="{{ $additionalImage.RelPermalink }}" loading="lazy">
+                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="protected-image">
                     {{ else }}
-                    {{ $resized := $additionalImage.Resize "800x800 webp q80" }}
-                    <img src="{{ $resized.RelPermalink }}" alt="{{ $.Title }}" class="clickable-image"
-                        data-full-res="{{ $additionalImage.RelPermalink }}" loading="lazy">
+                    {{ $resized := $additionalImage.Resize (printf "%s %s %s" $imageConfig.galleryImageMaxSize $imageConfig.galleryImageFormat $imageConfig.galleryImageQuality) }}
+                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="protected-image">
                     {{ end }}
+                    <!-- Image overlay commented out - no larger viewing
                     <div class="image-overlay">
                         <span class="zoom-icon">🔍</span>
                     </div>
+                    -->
                 </div>
                 {{ else }}
                 <div class="image-container">
-                    <img src="{{ . }}" alt="{{ $.Title }}" class="clickable-image" data-full-res="{{ . }}" loading="lazy">
+                    <img src="{{ . }}" alt="{{ $.Title }}" class="protected-image">
+                    <!-- Image overlay commented out - no larger viewing
                     <div class="image-overlay">
                         <span class="zoom-icon">🔍</span>
                     </div>
+                    -->
                 </div>
                 {{ end }}
             </div>
@@ -80,12 +84,23 @@
         <a href="{{ .Parent.RelPermalink }}" class="back-link">← Back to {{ .Parent.Title }}</a>
     </div>
 </div>
-<!-- Full Resolution Image Modal -->
+
+<!-- Modal functionality commented out - no larger image viewing
 <div id="imageModal" class="image-modal">
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <img id="modalImage" src="" alt="Full resolution image">
+        <div class="modal-image-container">
+            <img id="modalImage" src="" alt="Protected image view">
+            <div class="watermark-overlay">
+                <div class="watermark-text">© {{ $imageConfig.watermarkText }}</div>
+                <div class="watermark-subtext">{{ $imageConfig.watermarkSubtext }}</div>
+            </div>
+        </div>
         <div class="modal-caption"></div>
+        <div class="protection-notice">
+            <p>{{ $imageConfig.protectionNotice1 }}</p>
+            <p>{{ $imageConfig.protectionNotice2 }}</p>
+        </div>
     </div>
 </div>
 
@@ -124,6 +139,19 @@
                 modal.style.display = 'none';
             }
         });
+
+        // Prevent right-click on modal image
+        modalImg.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Prevent drag and drop of modal image
+        modalImg.addEventListener('dragstart', function (e) {
+            e.preventDefault();
+            return false;
+        });
     });
 </script>
+-->
 {{ end }}

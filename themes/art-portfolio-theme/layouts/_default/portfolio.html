@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (container) {
                 container.classList.remove('loading');
                 container.classList.add('cached', 'loaded');
-                img.classList.add('image-fade-in');
+                // Don't add image-fade-in class for cached images to prevent motion
             }
         } else if (img.complete && img.naturalWidth === 0) {
             handlePortfolioImageError(img, overlay);

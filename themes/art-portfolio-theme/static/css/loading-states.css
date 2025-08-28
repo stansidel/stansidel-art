@@ -208,3 +208,21 @@
     opacity: 1 !important;
     transition: none !important;
 }
+
+/* Override fade-in animation for cached images */
+.progressive-image.cached img.image-fade-in {
+    animation: none !important;
+    transform: none !important;
+}
+
+/* Ensure cached images never show any motion or transitions */
+.progressive-image.cached img {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+}
+
+.progressive-image.cached {
+    animation: none !important;
+    transition: none !important;
+}

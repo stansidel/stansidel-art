@@ -11,13 +11,28 @@
                 {{ $image := .Resources.GetMatch .Params.image }}
                 {{ if $image }}
                 {{ if eq $image.MediaType.SubType "svg" }}
-                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
+                <div class="portfolio-image-container progressive-image" data-image-id="home-{{ .File.UniqueID }}">
+                    <div class="image-loading-overlay portfolio-overlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" loading="lazy" data-image-type="svg">
+                </div>
                 {{ else }}
                 {{ $resized := $image.Resize "600x webp q80" }}
-                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
+                <div class="portfolio-image-container progressive-image" data-image-id="home-{{ .File.UniqueID }}">
+                    <div class="image-loading-overlay portfolio-overlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" loading="lazy" data-image-type="resized">
+                </div>
                 {{ end }}
                 {{ else }}
-                <img src="{{ .Params.image }}" alt="{{ .Title }}" loading="lazy">
+                <div class="portfolio-image-container progressive-image" data-image-id="home-{{ .File.UniqueID }}">
+                    <div class="image-loading-overlay portfolio-overlay">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <img src="{{ .Params.image }}" alt="{{ .Title }}" loading="lazy" data-image-type="external">
+                </div>
                 {{ end }}
                 {{ end }}
             </a>
@@ -26,4 +41,88 @@
         </div>
     {{ end }}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Progressive image loading for home page thumbnails
+    const homeImages = document.querySelectorAll('.portfolio-image-container img');
+    const homeOverlays = document.querySelectorAll('.portfolio-overlay');
+    
+    // Function to handle image load success
+    function handleHomeImageLoad(img, overlay) {
+        if (overlay) {
+            overlay.classList.add('hidden');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        }
+        
+        const container = img.closest('.progressive-image');
+        if (container) {
+            container.classList.remove('loading');
+            container.classList.add('loaded');
+            img.classList.add('image-fade-in');
+        }
+    }
+    
+    // Function to handle image load error
+    function handleHomeImageError(img, overlay) {
+        if (overlay) {
+            overlay.innerHTML = '<div class="image-error">⚠️</div>';
+        }
+        
+        const container = img.closest('.progressive-image');
+        if (container) {
+            container.classList.add('image-error');
+        }
+    }
+    
+    // Set up image loading for each home page image
+    homeImages.forEach((img) => {
+        const overlay = img.parentElement.querySelector('.image-loading-overlay');
+        
+        // Create placeholder immediately
+        const container = img.closest('.progressive-image');
+        if (container && img.dataset.imageType !== 'svg') {
+            container.classList.add('loading');
+        }
+        
+        // Handle successful load
+        img.addEventListener('load', function() {
+            handleHomeImageLoad(this, overlay);
+        });
+        
+        // Handle load error
+        img.addEventListener('error', function() {
+            handleHomeImageError(this, overlay);
+        });
+        
+        // If image is already loaded (from cache), handle it immediately
+        if (img.complete && img.naturalWidth > 0) {
+            // Handle cached images without loading state
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+            
+            if (container) {
+                container.classList.remove('loading');
+                container.classList.add('cached', 'loaded');
+                // Don't add image-fade-in class for cached images to prevent motion
+            }
+        } else if (img.complete && img.naturalWidth === 0) {
+            handleHomeImageError(img, overlay);
+        }
+    });
+    
+    // Add timeout for slow connections on home page images
+    const slowConnectionTimeout = 8000; // 8 seconds for thumbnails
+    homeOverlays.forEach(overlay => {
+        setTimeout(() => {
+            if (overlay.style.display !== 'none') {
+                overlay.innerHTML = '<div class="loading-text">Still loading...</div>';
+            }
+        }, slowConnectionTimeout);
+    });
+});
+</script>
 {{ end }}

@@ -13,29 +13,29 @@
         <div class="project-main-image">
             {{ $image := .Resources.GetMatch .Params.image }}
             {{ if $image }}
-            <div class="image-container">
+            <div class="image-container progressive-image" data-image-id="main-image">
+                <div class="image-loading-overlay" id="main-image-overlay">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading image...</div>
+                    </div>
+                </div>
                 {{ if eq $image.MediaType.SubType "svg" }}
-                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
+                <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy" data-image-type="svg">
                 {{ else }}
                 {{ $resized := $image.Resize (printf "%s %s %s" $imageConfig.mainImageMaxWidth $imageConfig.mainImageFormat $imageConfig.mainImageQuality) }}
-                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
+                <img src="{{ $resized.RelPermalink }}" alt="{{ .Title }}" class="protected-image" loading="lazy" data-image-type="resized">
                 {{ end }}
-                <!-- Image overlay commented out - no larger viewing
-                <div class="image-overlay">
-                    <span class="zoom-icon">🔍</span>
-                    <span class="zoom-text">Click to view larger</span>
-                </div>
-                -->
             </div>
             {{ else }}
-            <div class="image-container">
-                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="protected-image" loading="lazy">
-                <!-- Image overlay commented out - no larger viewing
-                <div class="image-overlay">
-                    <span class="zoom-icon">🔍</span>
-                    <span class="zoom-text">Click to view larger</span>
+            <div class="image-container progressive-image" data-image-id="main-image">
+                <div class="image-loading-overlay" id="main-image-overlay">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading image...</div>
+                    </div>
                 </div>
-                -->
+                <img src="{{ .Params.image }}" alt="{{ .Title }}" class="protected-image" loading="lazy" data-image-type="external">
             </div>
             {{ end }}
         </div>
@@ -43,31 +43,33 @@
         
         {{ if .Params.additional_images }}
         <div class="project-gallery">
-            {{ range .Params.additional_images }}
+            {{ range $index, $additionalImage := .Params.additional_images }}
             <div class="gallery-item">
-                {{ $additionalImage := $.Resources.GetMatch . }}
-                {{ if $additionalImage }}
-                <div class="image-container">
-                    {{ if eq $additionalImage.MediaType.SubType "svg" }}
-                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="protected-image">
-                    {{ else }}
-                    {{ $resized := $additionalImage.Resize (printf "%s %s %s" $imageConfig.galleryImageMaxSize $imageConfig.galleryImageFormat $imageConfig.galleryImageQuality) }}
-                    <img src="{{ $additionalImage.RelPermalink }}" alt="{{ $.Title }}" class="protected-image">
-                    {{ end }}
-                    <!-- Image overlay commented out - no larger viewing
-                    <div class="image-overlay">
-                        <span class="zoom-icon">🔍</span>
+                {{ $imageResource := $.Resources.GetMatch $additionalImage }}
+                {{ if $imageResource }}
+                <div class="image-container progressive-image" data-image-id="gallery-{{ $index }}">
+                    <div class="image-loading-overlay" id="gallery-{{ $index }}-overlay">
+                        <div class="loading-content">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Loading...</div>
+                        </div>
                     </div>
-                    -->
+                    {{ if eq $imageResource.MediaType.SubType "svg" }}
+                    <img src="{{ $imageResource.RelPermalink }}" alt="{{ $.Title }}" class="protected-image" loading="lazy" data-image-type="svg">
+                    {{ else }}
+                    {{ $resized := $imageResource.Resize (printf "%s %s %s" $imageConfig.galleryImageMaxSize $imageConfig.galleryImageFormat $imageConfig.galleryImageQuality) }}
+                    <img src="{{ $resized.RelPermalink }}" alt="{{ $.Title }}" class="protected-image" loading="lazy" data-image-type="resized">
+                    {{ end }}
                 </div>
                 {{ else }}
-                <div class="image-container">
-                    <img src="{{ . }}" alt="{{ $.Title }}" class="protected-image">
-                    <!-- Image overlay commented out - no larger viewing
-                    <div class="image-overlay">
-                        <span class="zoom-icon">🔍</span>
+                <div class="image-container progressive-image" data-image-id="gallery-{{ $index }}">
+                    <div class="image-loading-overlay" id="gallery-{{ $index }}-overlay">
+                        <div class="loading-content">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Loading...</div>
+                        </div>
                     </div>
-                    -->
+                    <img src="{{ $additionalImage }}" alt="{{ $.Title }}" class="protected-image" loading="lazy" data-image-type="external">
                 </div>
                 {{ end }}
             </div>
@@ -85,73 +87,117 @@
     </div>
 </div>
 
-<!-- Modal functionality commented out - no larger image viewing
-<div id="imageModal" class="image-modal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <div class="modal-image-container">
-            <img id="modalImage" src="" alt="Protected image view">
-            <div class="watermark-overlay">
-                <div class="watermark-text">© {{ $imageConfig.watermarkText }}</div>
-                <div class="watermark-subtext">{{ $imageConfig.watermarkSubtext }}</div>
-            </div>
-        </div>
-        <div class="modal-caption"></div>
-        <div class="protection-notice">
-            <p>{{ $imageConfig.protectionNotice1 }}</p>
-            <p>{{ $imageConfig.protectionNotice2 }}</p>
-        </div>
-    </div>
-</div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        const modalCaption = document.querySelector('.modal-caption');
-        const closeBtn = document.querySelector('.close-modal');
-        const clickableImages = document.querySelectorAll('.clickable-image');
-
-        // Open modal when image is clicked
-        clickableImages.forEach((img, index) => {
-            img.addEventListener('click', function () {
-                modal.style.display = 'block';
-                modalImg.src = this.getAttribute('data-full-res');
-                modalCaption.textContent = this.alt;
+document.addEventListener('DOMContentLoaded', function () {
+    // Progressive image loading with loading states
+    const images = document.querySelectorAll('.progressive-image img');
+    const loadingOverlays = document.querySelectorAll('.image-loading-overlay');
+    
+    // Function to handle image load success
+    function handleImageLoad(img, overlay) {
+        if (overlay) {
+            overlay.classList.add('hidden');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        }
+        
+        const container = img.closest('.progressive-image');
+        if (container) {
+            container.classList.remove('loading');
+            container.classList.add('loaded');
+            img.classList.add('image-fade-in');
+        }
+    }
+    
+    // Function to handle image load error
+    function handleImageError(img, overlay) {
+        if (overlay) {
+            overlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="image-error">
+                        <span>Failed to load image</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const container = img.closest('.progressive-image');
+        if (container) {
+            container.classList.add('image-error');
+        }
+    }
+    
+    // Function to create a low-quality placeholder
+    function createPlaceholder(img) {
+        const container = img.closest('.progressive-image');
+        if (container && !img.dataset.imageType === 'svg') {
+            container.classList.add('loading');
+        }
+    }
+    
+    // Set up image loading for each image
+    images.forEach((img, index) => {
+        const overlay = document.getElementById(img.closest('.progressive-image').dataset.imageId + '-overlay');
+        
+        // Create placeholder immediately
+        createPlaceholder(img);
+        
+        // Handle successful load
+        img.addEventListener('load', function() {
+            handleImageLoad(this, overlay);
+        });
+        
+        // Handle load error
+        img.addEventListener('error', function() {
+            handleImageError(this, overlay);
+        });
+        
+        // If image is already loaded (from cache), handle it immediately
+        if (img.complete) {
+            if (img.naturalWidth > 0) {
+                handleImageLoad(img, overlay);
+            } else {
+                handleImageError(img, overlay);
+            }
+        }
+    });
+    
+    // Add intersection observer for lazy loading
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                        observer.unobserve(img);
+                    }
+                }
             });
         });
-
-        // Close modal when clicking the close button
-        closeBtn.addEventListener('click', function () {
-            modal.style.display = 'none';
-        });
-
-        // Close modal when clicking outside the image
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-                modal.style.display = 'none';
+        
+        images.forEach(img => {
+            if (img.dataset.src) {
+                imageObserver.observe(img);
             }
         });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && modal.style.display === 'block') {
-                modal.style.display = 'none';
+    }
+    
+    // Add timeout for slow connections
+    const slowConnectionTimeout = 10000; // 10 seconds
+    loadingOverlays.forEach(overlay => {
+        setTimeout(() => {
+            if (overlay.style.display !== 'none') {
+                overlay.innerHTML = `
+                    <div class="loading-content">
+                        <div class="loading-text">Still loading...<br><small>Slow connection detected</small></div>
+                    </div>
+                `;
             }
-        });
-
-        // Prevent right-click on modal image
-        modalImg.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-            return false;
-        });
-
-        // Prevent drag and drop of modal image
-        modalImg.addEventListener('dragstart', function (e) {
-            e.preventDefault();
-            return false;
-        });
+        }, slowConnectionTimeout);
     });
+});
 </script>
--->
 {{ end }}

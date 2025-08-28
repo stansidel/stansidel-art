@@ -15,6 +15,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "css/loading-states.css" | relURL }}">
+    <!-- Enhanced image loading -->
+    <script>
+    // Enhanced image loading with network detection
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect network conditions
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
+        
+        // Adjust loading strategy based on network
+        if (isSlowConnection) {
+            // Use lower quality images for slow connections
+            const images = document.querySelectorAll('img[data-low-quality]');
+            images.forEach(img => {
+                if (img.dataset.lowQuality) {
+                    img.src = img.dataset.lowQuality;
+                }
+            });
+        }
+        
+        // Enhanced retry logic for failed images
+        const retryFailedImages = () => {
+            const failedImages = document.querySelectorAll('.image-error img');
+            failedImages.forEach(img => {
+                setTimeout(() => {
+                    img.src = img.src; // Retry loading
+                }, 2000);
+            });
+        };
+        
+        // Retry failed images every 30 seconds
+        setInterval(retryFailedImages, 30000);
+    });
+    </script>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ "favicon.ico" | relURL }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ "favicon-32x32.png" | relURL }}">

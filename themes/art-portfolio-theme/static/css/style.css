@@ -66,8 +66,10 @@ main {
 
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
+    grid-template-columns: repeat(3, 300px);
     gap: 0;
+    margin: 0 auto;
+    max-width: 900px;
 }
 
 .portfolio-item {

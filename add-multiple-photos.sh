@@ -3,6 +3,10 @@
 # Bulk photo upload script for Hugo portfolio
 # Usage: ./add-multiple-photos.sh <category> <photos-directory> [title-prefix]
 
+# Source shared utility functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/photo-metadata-utils.sh"
+
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
     echo "Usage: $0 <category> <photos-directory> [title-prefix]"
     echo ""
@@ -53,99 +57,6 @@ is_image() {
         fi
     done
     return 1
-}
-
-# Function to extract date from filename
-extract_date_from_filename() {
-    local filename="$1"
-    local basename=$(basename "$filename" | sed 's/\.[^.]*$//')
-    
-    # Try to match YYYYMMDD format (8 digits at the beginning)
-    if [[ "$basename" =~ ^([0-9]{8}) ]]; then
-        local date_str="${BASH_REMATCH[1]}"
-        local year="${date_str:0:4}"
-        local month="${date_str:4:2}"
-        local day="${date_str:6:2}"
-        
-        # Validate date components
-        if [[ "$month" -ge 1 && "$month" -le 12 && "$day" -ge 1 && "$day" -le 31 ]]; then
-            echo "${year}-${month}-${day}"
-            return 0
-        fi
-    fi
-    
-    # Try to match YYMMDD format (6 digits at the beginning)
-    if [[ "$basename" =~ ^([0-9]{6}) ]]; then
-        local date_str="${BASH_REMATCH[1]}"
-        local year="${date_str:0:2}"
-        local month="${date_str:2:2}"
-        local day="${date_str:4:2}"
-        
-        # Validate date components
-        if [[ "$month" -ge 1 && "$month" -le 12 && "$day" -ge 1 && "$day" -le 31 ]]; then
-            # Assume 20xx for years (you can modify this logic if needed)
-            echo "20${year}-${month}-${day}"
-            return 0
-        fi
-    fi
-    
-    # No valid date found
-    return 1
-}
-
-# Function to extract photo metadata using exiftool
-extract_photo_metadata() {
-    local image_file="$1"
-    
-    # Check if exiftool is available
-    if ! command -v exiftool &> /dev/null; then
-        echo "⚠️  exiftool not found - metadata extraction disabled"
-        return 1
-    fi
-    
-    # Extract metadata fields individually
-    local title=$(exiftool -Title -b "$image_file" 2>/dev/null)
-    local description=$(exiftool -Description -b "$image_file" 2>/dev/null)
-    local caption=$(exiftool -Caption-Abstract -b "$image_file" 2>/dev/null)
-    local make=$(exiftool -Make -b "$image_file" 2>/dev/null)
-    
-    # Try to get camera model from multiple possible fields
-    local model=$(exiftool -"Camera Model Name" -b "$image_file" 2>/dev/null)
-    if [ -z "$model" ]; then
-        model=$(exiftool -Model -b "$image_file" 2>/dev/null)
-    fi
-    if [ -z "$model" ]; then
-        model=$(exiftool -"Model Name" -b "$image_file" 2>/dev/null)
-    fi
-    
-    local focal_length=$(exiftool -FocalLength -b "$image_file" 2>/dev/null)
-    local f_number=$(exiftool -FNumber -b "$image_file" 2>/dev/null)
-    local exposure_time=$(exiftool -ExposureTime -b "$image_file" 2>/dev/null)
-    local metering_mode=$(exiftool -MeteringMode -b "$image_file" 2>/dev/null)
-    local iso=$(exiftool -ISO -b "$image_file" 2>/dev/null)
-    local date_time=$(exiftool -DateTimeOriginal -b "$image_file" 2>/dev/null)
-    
-
-    
-    # Return metadata as a structured string
-    echo "TITLE:$title|DESCRIPTION:$description|CAPTION:$caption|MAKE:$make|MODEL:$model|FOCAL:$focal_length|FNUMBER:$f_number|EXPOSURE:$exposure_time|METERING:$metering_mode|ISO:$iso|DATETIME:$date_time"
-}
-
-# Function to clean filename (replace special chars with underscores)
-clean_filename() {
-    local filename="$1"
-    local basename=$(basename "$filename" | sed 's/\.[^.]*$//')
-    local extension="${filename##*.}"
-    
-    # Replace special characters with underscores, then consolidate consecutive underscores
-    local clean_name=$(echo "$basename" | sed 's/[^a-zA-Z0-9]/_/g' | sed 's/__*/_/g' | sed 's/^_//' | sed 's/_$//')
-    
-    # If clean name is empty, use a default
-    if [ -z "$clean_name" ]; then
-        clean_name="image"
-    fi
-    
-    echo "${clean_name}.${extension}"
 }
 
 # Function to generate title from filename
@@ -213,189 +124,46 @@ for image_file in "${IMAGE_FILES[@]}"; do
     # Extract photo metadata
     echo "   📸 Extracting photo metadata..."
     if metadata_output=$(extract_photo_metadata "$image_file"); then
-        # Parse metadata string (key:value|key:value format)
-        photo_title=$(echo "$metadata_output" | grep -o 'TITLE:[^|]*' | cut -d: -f2)
-        photo_description=$(echo "$metadata_output" | grep -o 'DESCRIPTION:[^|]*' | cut -d: -f2)
-        photo_caption=$(echo "$metadata_output" | grep -o 'CAPTION:[^|]*' | cut -d: -f2)
-        camera_make=$(echo "$metadata_output" | grep -o 'MAKE:[^|]*' | cut -d: -f2)
-        camera_model=$(echo "$metadata_output" | grep -o 'MODEL:[^|]*' | cut -d: -f2)
-        focal_length=$(echo "$metadata_output" | grep -o 'FOCAL:[^|]*' | cut -d: -f2)
-        f_number=$(echo "$metadata_output" | grep -o 'FNUMBER:[^|]*' | cut -d: -f2)
-        exposure_time=$(echo "$metadata_output" | grep -o 'EXPOSURE:[^|]*' | cut -d: -f2)
-        metering_mode=$(echo "$metadata_output" | grep -o 'METERING:[^|]*' | cut -d: -f2)
-        iso=$(echo "$metadata_output" | grep -o 'ISO:[^|]*' | cut -d: -f2)
-        photo_date_time=$(echo "$metadata_output" | grep -o 'DATETIME:[^|]*' | cut -d: -f2)
+        # Use the shared function to parse metadata and generate content
+        content_output=$(parse_metadata_and_generate_content "$metadata_output" "$original_filename" "$TITLE_PREFIX")
         
-
+        # Parse the returned content string using shared function
+        parsed_content=$(parse_content_output "$content_output")
+        title=$(echo "$parsed_content" | grep -o 'TITLE:[^|]*' | cut -d: -f2)
+        description=$(echo "$parsed_content" | grep -o 'DESCRIPTION:[^|]*' | cut -d: -f2)
+        date=$(echo "$parsed_content" | grep -o 'DATE:[^|]*' | cut -d: -f2)
+        # camera_make=$(echo "$parsed_content" | grep -o 'MAKE:[^|]*' | cut -d: -f2)
+        # camera_model=$(echo "$parsed_content" | grep -o 'MODEL:[^|]*' | cut -d: -f2)
+        # focal_length=$(echo "$parsed_content" | grep -o 'FOCAL:[^|]*' | cut -d: -f2)
+        # f_number=$(echo "$parsed_content" | grep -o 'FNUMBER:[^|]*' | cut -d: -f2)
+        # exposure_time=$(echo "$parsed_content" | grep -o 'EXPOSURE:[^|]*' | cut -d: -f2)
+        # iso=$(echo "$parsed_content" | grep -o 'ISO:[^|]*' | cut -d: -f2)
         
-        # Use photo title if available and meaningful, otherwise generate from filename
-        if [ -n "$photo_title" ] && [ "$photo_title" != "$camera_make" ] && [ "$photo_title" != "$camera_model" ]; then
-            title="$photo_title"
-            echo "   🏷️  Using photo title: $title"
+        # Log what we're using
+        echo "   🏷️  Title: $title"
+        if [ -n "$description" ]; then
+            echo "   📝 Description: $description"
         else
-            title=$(generate_title "$original_filename")
-            echo "   🏷️  Generated title: $title"
-        fi
-        
-        # Use photo description/caption if available and meaningful, otherwise leave empty
-        if [ -n "$photo_description" ] && [ "$photo_description" != "$camera_make" ] && [ "$photo_description" != "$camera_model" ]; then
-            description="$photo_description"
-            echo "   📝 Using photo description: $description"
-        elif [ -n "$photo_caption" ] && [ "$photo_caption" != "$camera_make" ] && [ "$photo_caption" != "$camera_model" ]; then
-            description="$photo_caption"
-            echo "   📝 Using photo caption: $description"
-        else
-            description=""
             echo "   📝 No description found - leaving empty"
         fi
-        
-        # Use photo date if available, otherwise try filename, fallback to current date
-        if [ -n "$photo_date_time" ]; then
-            # Convert exiftool date format (YYYY:MM:DD HH:MM:SS) to YYYY-MM-DD
-            date=$(echo "$photo_date_time" | sed 's/\([0-9]\{4\}\):\([0-9]\{2\}\):\([0-9]\{2\}\).*/\1-\2-\3/')
-            # Validate the extracted date
-            if [[ "$date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-                echo "   📅 Using photo date: $date"
-            else
-                # If date parsing failed, try filename extraction
-                if extracted_date=$(extract_date_from_filename "$original_filename"); then
-                    date="$extracted_date"
-                    echo "   📅 Using filename date: $date"
-                else
-                    date=$(date +%Y-%m-%d)
-                    echo "   📅 Using current date: $date"
-                fi
-            fi
-        elif extracted_date=$(extract_date_from_filename "$original_filename"); then
-            date="$extracted_date"
-            echo "   📅 Using filename date: $date"
-        else
-            date=$(date +%Y-%m-%d)
-            echo "   📅 Using current date: $date"
-        fi
+        echo "   📅 Date: $date"
     else
         # Fallback to basic extraction if metadata extraction fails
         title=$(generate_title "$original_filename")
+        if [ -n "$TITLE_PREFIX" ]; then
+            title="$TITLE_PREFIX - $title"
+        fi
         description=""
         
         if extracted_date=$(extract_date_from_filename "$original_filename"); then
             date="$extracted_date"
-            echo "   📅 Using filename date: $date"
         else
             date=$(date +%Y-%m-%d)
-            echo "   📅 Using current date: $date"
         fi
     fi
     
-    # Create content file
-    cat > "$BUNDLE_DIR/index.md" << EOF
----
-title: "$title"
-description: "$description"
-image: "$clean_filename_output"
-date: $date
-draft: true
----
-
-EOF
-
-# Add description to post body only if it exists
-if [ -n "$description" ]; then
-    echo "$description" >> "$BUNDLE_DIR/index.md"
-    echo "" >> "$BUNDLE_DIR/index.md"
-fi
-    
-    # Add technical details if available
-    if [ -n "$camera_make" ] || [ -n "$camera_model" ] || [ -n "$focal_length" ] || [ -n "$f_number" ] || [ -n "$exposure_time" ] || [ -n "$iso" ]; then
-        cat >> "$BUNDLE_DIR/index.md" << EOF
-
-EOF
-        
-        # Build technical details in standard photography format: Camera | Focal Length | Aperture | Exposure | ISO
-        tech_details=""
-        
-        # Camera
-        if [ -n "$camera_make" ] && [ -n "$camera_model" ]; then
-            # Clean up redundant camera information more carefully
-            clean_make=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
-            clean_model=$(echo "$camera_model" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
-            
-            # Check if model already contains the cleaned make (case-insensitive)
-            if [[ "$(echo "$clean_model" | tr '[:upper:]' '[:lower:]')" == *"$(echo "$clean_make" | tr '[:upper:]' '[:lower:]')"* ]]; then
-                # If model contains make, use only the model
-                tech_details="$clean_model"
-            elif [ -n "$clean_make" ] && [ "$clean_make" != "$clean_model" ] && [ ${#clean_make} -gt 2 ]; then
-                # Use both if they're genuinely different and make is substantial (more than 2 chars)
-                tech_details="$clean_make $clean_model"
-            else
-                # Fallback to just the model
-                tech_details="$clean_model"
-            fi
-        elif [ -n "$camera_make" ]; then
-            # Clean up make if it's the only camera info, but preserve case
-            tech_details=$(echo "$camera_make" | sed 's/CORPORATION//g' | sed 's/INC//g' | sed 's/LTD//g' | sed 's/LLC//g' | sed 's/CO//g' | sed 's/\.//g' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
-        elif [ -n "$camera_model" ]; then
-            tech_details="$camera_model"
-        fi
-        
-        # Focal Length
-        if [ -n "$focal_length" ] && [ "$focal_length" != "0" ] && [ "$focal_length" != "0.005714285714" ]; then
-            if [ -n "$tech_details" ]; then
-                tech_details="$tech_details | $focal_length mm"
-            else
-                tech_details="$focal_length mm"
-            fi
-        fi
-        
-        # Aperture
-        if [ -n "$f_number" ] && [ "$f_number" != "0" ] && [ "$f_number" != "0.005714285714" ]; then
-            if [ -n "$tech_details" ]; then
-                tech_details="$tech_details | f/$f_number"
-            else
-                tech_details="f/$f_number"
-            fi
-        fi
-        
-        # Exposure
-        if [ -n "$exposure_time" ] && [ "$exposure_time" != "0" ]; then
-            exposure_formatted=""
-            if [[ "$exposure_time" =~ ^[0-9]+/[0-9]+$ ]]; then
-                exposure_formatted="$exposure_time"
-            elif [[ "$exposure_time" =~ ^[0-9]+\.?[0-9]*$ ]]; then
-                # Convert decimal to fraction (e.g., 0.01666666667 -> 1/60)
-                exposure_fraction=$(awk "BEGIN {printf \"1/%.0f\", 1/$exposure_time}")
-                # Handle very long exposures (over 1 second)
-                if (( $(echo "$exposure_time >= 1" | bc -l 2>/dev/null || echo "0") )); then
-                    exposure_formatted="${exposure_time}s"
-                else
-                    exposure_formatted="$exposure_fraction"
-                fi
-            else
-                exposure_formatted="$exposure_time"
-            fi
-            
-            if [ -n "$tech_details" ]; then
-                tech_details="$tech_details | $exposure_formatted"
-            else
-                tech_details="$exposure_formatted"
-            fi
-        fi
-        
-        # ISO
-        if [ -n "$iso" ] && [ "$iso" != "0" ] && [ "$iso" != "0.005714285714" ]; then
-            if [ -n "$tech_details" ]; then
-                tech_details="$tech_details | ISO $iso"
-            else
-                tech_details="ISO $iso"
-            fi
-        fi
-        
-        # Output the combined technical details
-        if [ -n "$tech_details" ]; then
-            echo "$tech_details" >> "$BUNDLE_DIR/index.md"
-        fi
-    fi
-    
+    # Create content file using shared function
+    generate_hugo_content "$title" "$description" "$clean_filename_output" "$date" "$camera_make" "$camera_model" "$focal_length" "$f_number" "$exposure_time" "$iso" > "$BUNDLE_DIR/index.md"    
     echo "✅ Created bundle for $original_filename"
     echo "   📁 Directory: $BUNDLE_DIR"
     echo "   📝 Content: $BUNDLE_DIR/index.md"

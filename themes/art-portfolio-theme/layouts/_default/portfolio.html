@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="portfolio-grid-container">
     <div class="portfolio-grid">
-        {{ range .Pages }}
+        {{ range sort .Pages "Date" "desc" }}
         <div class="portfolio-item">
             <a href="{{ .RelPermalink }}">
                 {{ if .Params.image }}

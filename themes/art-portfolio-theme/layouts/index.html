@@ -4,7 +4,7 @@
     {{ $categoryPage := .Site.GetPage $firstCategory.Identifier }}
     {{ if $categoryPage }}
     <div class="portfolio-grid">
-        {{ range $categoryPage.Pages }}
+        {{ range sort $categoryPage.Pages "Date" "desc" }}
         <div class="portfolio-item">
             <a href="{{ .RelPermalink }}">
                 {{ if .Params.image }}
